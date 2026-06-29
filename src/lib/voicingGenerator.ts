@@ -1,4 +1,4 @@
-import { OPEN_MIDI, CHROMATIC } from '../constants/guitar';
+import { CHROMATIC } from '../constants/guitar';
 import type { VoicingPosition } from '../types';
 
 // @tonaljs/chord returns flat names; CHROMATIC is all-sharps
@@ -10,22 +10,55 @@ function normalize(note: string): string {
   return ENHARMONIC[note] ?? note;
 }
 
-function noteAt(si: number, absFret: number): string {
-  return CHROMATIC[((OPEN_MIDI[si] + absFret) % 12 + 12) % 12];
+// How many independent finger placements does this voicing need?
+// Strings sharing the lowest fretted position can be covered by one barre finger.
+function effectiveFingers(absFrets: number[]): number {
+  const fretted = absFrets.filter((f) => f > 0);
+  if (fretted.length === 0) return 0;
+  const minF = Math.min(...fretted);
+  const atMin = fretted.filter((f) => f === minF).length;
+  const distinctAbove = new Set(fretted.filter((f) => f > minF)).size;
+  return (atMin >= 2 ? 1 : atMin) + distinctAbove;
+}
+
+// Reject voicings whose fret sequence zigzags in both directions —
+// e.g. 4,2,1,4,4,2 reverses direction twice (down→down→UP→down) which
+// no hand position can form. One reversal (like a barre shape) is fine.
+function isShapePlayable(absFrets: number[]): boolean {
+  const fretted = absFrets.filter((f) => f > 0);
+  if (fretted.length <= 2) return true;
+  let reversals = 0;
+  let lastDir = 0; // -1 down, +1 up
+  for (let i = 1; i < fretted.length; i++) {
+    const diff = fretted[i] - fretted[i - 1];
+    if (diff === 0) continue;
+    const dir = diff > 0 ? 1 : -1;
+    if (lastDir !== 0 && dir !== lastDir) reversals++;
+    lastDir = dir;
+  }
+  return reversals < 2;
 }
 
 const NUM_STRINGS = 6;
-const WINDOW_SIZE = 4;   // each window spans [w, w+3]
-const MAX_SPAN = 3;       // max - min of fretted notes ≤ 3
+const WINDOW_SIZE = 4;    // each window spans [w, w+3]
+const MAX_SPAN = 3;        // max - min of fretted notes ≤ 3
 const MAX_WINDOW_START = 17;
+const MIN_SOUNDING = 4;   // at least 4 strings must sound
+const MAX_FINGERS = 3;    // effective finger placements ≤ 3
 
-export function generateVoicings(chordNotes: string[]): VoicingPosition[] {
+export function generateVoicings(
+  chordNotes: string[],
+  openMidi: readonly number[],
+): VoicingPosition[] {
   const requiredPcs = new Set(chordNotes.map(normalize));
   if (requiredPcs.size === 0) return [];
 
+  function noteAt(si: number, absFret: number): string {
+    return CHROMATIC[((openMidi[si] + absFret) % 12 + 12) % 12];
+  }
+
   const seen = new Set<string>();
   const results: VoicingPosition[] = [];
-  // Reused buffer of absolute frets, one per string
   const buf = new Array<number>(NUM_STRINGS);
 
   let windowStart = 1;
@@ -37,8 +70,7 @@ export function generateVoicings(chordNotes: string[]): VoicingPosition[] {
     soundingStarted: boolean,
     soundingCount: number,
   ): void {
-    // Prune: not enough strings left to reach minimum of 3 sounding
-    if (soundingCount + (NUM_STRINGS - si) < 3) return;
+    if (soundingCount + (NUM_STRINGS - si) < MIN_SOUNDING) return;
 
     if (si === NUM_STRINGS) {
       commit();
@@ -51,7 +83,7 @@ export function generateVoicings(chordNotes: string[]): VoicingPosition[] {
       dfs(si + 1, minF, maxF, false, soundingCount);
     }
 
-    // Open string (fret 0) — only if its note is a chord tone
+    // Open string — only if its note is a chord tone
     {
       const note = noteAt(si, 0);
       if (requiredPcs.has(note)) {
@@ -76,7 +108,6 @@ export function generateVoicings(chordNotes: string[]): VoicingPosition[] {
   }
 
   function commit(): void {
-    // All required pitch classes must be present
     const present = new Set<string>();
     for (let si = 0; si < NUM_STRINGS; si++) {
       if (buf[si] !== -1) present.add(noteAt(si, buf[si]));
@@ -84,6 +115,9 @@ export function generateVoicings(chordNotes: string[]): VoicingPosition[] {
     for (const pc of requiredPcs) {
       if (!present.has(pc)) return;
     }
+
+    if (effectiveFingers(buf as number[]) > MAX_FINGERS) return;
+    if (!isShapePlayable(buf as number[])) return;
 
     const key = buf.join(',');
     if (seen.has(key)) return;
@@ -107,7 +141,7 @@ export function generateVoicings(chordNotes: string[]): VoicingPosition[] {
 
     const midi: number[] = [];
     for (let si = 0; si < NUM_STRINGS; si++) {
-      if (buf[si] !== -1) midi.push(OPEN_MIDI[si] + buf[si]);
+      if (buf[si] !== -1) midi.push(openMidi[si] + buf[si]);
     }
 
     return { frets, fingers: [], baseFret, barres: [], midi };
@@ -119,11 +153,9 @@ export function generateVoicings(chordNotes: string[]): VoicingPosition[] {
 
   results.sort((a, b) => {
     if (a.baseFret !== b.baseFret) return a.baseFret - b.baseFret;
-    // Prefer fewer muted strings (fuller voicings first)
     const aMutes = a.frets.filter((f) => f === -1).length;
     const bMutes = b.frets.filter((f) => f === -1).length;
     if (aMutes !== bMutes) return aMutes - bMutes;
-    // Prefer fewer open strings (more fretted = more distinctive shape)
     const aOpens = a.frets.filter((f) => f === 0).length;
     const bOpens = b.frets.filter((f) => f === 0).length;
     return aOpens - bOpens;

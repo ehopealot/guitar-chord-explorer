@@ -14,24 +14,106 @@ body {
 .app {
   max-width: 780px;
   margin: 0 auto;
-  padding: 24px 16px 48px;
+  padding: 24px 16px calc(var(--progression-height, 240px) + 24px);
 }
 
 .app-header {
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 20px;
 }
 
 .app-header h1 {
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 700;
   color: #111;
-  margin-bottom: 6px;
 }
 
-.app-subtitle {
+/* ── Global controls bar (tuning + tabs) ── */
+
+.app-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+/* ── Tabs ── */
+
+.tab-bar {
+  display: flex;
+  gap: 4px;
+  background: #f0f0f0;
+  border-radius: 8px;
+  padding: 3px;
+}
+
+.tab-btn {
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #666;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  color: #333;
+  background: rgba(0,0,0,0.06);
+}
+
+.tab-btn--active {
+  background: #fff;
+  color: #111;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* ── Tuning selector ── */
+
+.tuning-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tuning-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.tuning-select {
   font-size: 14px;
-  color: #888;
+  color: #222;
+  background: #fff;
+  border: 1.5px solid #ddd;
+  border-radius: 7px;
+  padding: 6px 28px 6px 10px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 9px center;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  transition: border-color 0.15s;
+}
+
+.tuning-select:hover {
+  border-color: #aaa;
+}
+
+.tuning-select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
 }
 
 /* ── Fretboard section ── */
@@ -301,4 +383,249 @@ body {
   font-size: 10px;
   letter-spacing: 1px;
   margin-top: 2px;
+}
+
+/* ── Progression strip (fixed at bottom) ── */
+
+.progression-section {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-top: 1.5px solid #e5e7eb;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.09);
+  padding: 8px 16px 12px;
+}
+
+.progression-inner {
+  max-width: 748px;
+  margin: 0 auto;
+}
+
+.progression-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.progression-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.9px;
+  color: #888;
+}
+
+.progression-area {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 10px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 10px 12px;
+  min-height: 60px;
+  border: 2px dashed #e0e0e0;
+  border-radius: 10px;
+  background: #fafafa;
+  align-items: center;
+  transition: border-color 0.15s, background 0.15s;
+  scrollbar-width: thin;
+  scrollbar-color: #ddd transparent;
+}
+
+.progression-area::-webkit-scrollbar {
+  height: 4px;
+}
+
+.progression-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.progression-area::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 2px;
+}
+
+.progression-area--over {
+  border-color: #2563eb;
+  background: rgba(37, 99, 235, 0.04);
+}
+
+.progression-placeholder {
+  font-size: 13px;
+  color: #c0c0c0;
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.progression-card-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.progression-remove {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  z-index: 10;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: none;
+  background: #e5e7eb;
+  color: #555;
+  font-size: 14px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.12s, color 0.12s;
+}
+
+.progression-remove:hover {
+  background: #dc2626;
+  color: #fff;
+}
+
+/* Floating card shown during drag */
+.drag-overlay-card {
+  transform: scale(1.06);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  cursor: grabbing;
+  opacity: 0.96;
+}
+
+/* ── Chord Builder ── */
+
+.chord-builder {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.chord-input-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.chord-input {
+  width: 100%;
+  font-size: 22px;
+  font-weight: 600;
+  padding: 12px 44px 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  background: #fff;
+  color: #111;
+  outline: none;
+  letter-spacing: 0.5px;
+  transition: border-color 0.15s;
+}
+
+.chord-input::placeholder {
+  font-weight: 400;
+  font-size: 16px;
+  color: #bbb;
+}
+
+.chord-input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+}
+
+.chord-input-clear {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #aaa;
+  cursor: pointer;
+  line-height: 1;
+  padding: 4px;
+  transition: color 0.12s;
+}
+
+.chord-input-clear:hover { color: #555; }
+
+.builder-chord-info {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.builder-chord-info--unknown .builder-chord-name {
+  color: #e53e3e;
+}
+
+.builder-chord-name {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111;
+}
+
+.builder-chord-notes {
+  font-size: 14px;
+  color: #888;
+}
+
+.builder-keyboard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.builder-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.builder-group-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: #aaa;
+  width: 72px;
+  flex-shrink: 0;
+}
+
+.builder-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.builder-btn {
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #444;
+  background: #f3f4f6;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+  white-space: nowrap;
+}
+
+.builder-btn:hover {
+  background: #e5e7eb;
+  border-color: #d1d5db;
+}
+
+.builder-chord-name--unknown {
+  color: #e53e3e;
 }

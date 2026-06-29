@@ -10,6 +10,9 @@ type DbChords = Record<string, DbChordEntry[]>;
 const dbChords = guitarDb.chords as unknown as DbChords;
 const dbSuffixes = new Set(guitarDb.suffixes as string[]);
 
+// Standard tuning MIDI — DB voicings are only valid for this
+const STANDARD_MIDI = [40, 45, 50, 55, 59, 64];
+
 function resolveDbSuffix(chord: DetectedChord): string | null {
   for (const alias of chord.aliases) {
     if (alias !== '' && dbSuffixes.has(alias)) return alias;
@@ -25,9 +28,14 @@ function absKey(pos: VoicingPosition): string {
   return pos.frets.map((f) => (f <= 0 ? f : pos.baseFret + f - 1)).join(',');
 }
 
-export function lookupVoicings(detectedChords: DetectedChord[], limit = 100): NamedVoicing[] {
+export function lookupVoicings(
+  detectedChords: DetectedChord[],
+  openMidi: readonly number[],
+  limit = 100,
+): NamedVoicing[] {
   const voicings: NamedVoicing[] = [];
   const seenKeys = new Set<string>();
+  const isStandard = openMidi.every((m, i) => m === STANDARD_MIDI[i]);
 
   function push(pos: VoicingPosition, chord: DetectedChord, suffix: string): boolean {
     if (voicings.length >= limit) return false;
@@ -48,18 +56,20 @@ export function lookupVoicings(detectedChords: DetectedChord[], limit = 100): Na
     const suffix = resolveDbSuffix(chord);
     if (!dbKey || !suffix) continue;
 
-    // Phase 1: curated DB positions
-    const entries = dbChords[dbKey] ?? [];
-    const matched = entries.find((e) => e.suffix === suffix);
-    for (const pos of matched?.positions ?? []) {
-      if (!push(pos, chord, suffix)) break;
+    // Phase 1: curated DB positions (standard tuning only)
+    if (isStandard) {
+      const entries = dbChords[dbKey] ?? [];
+      const matched = entries.find((e) => e.suffix === suffix);
+      for (const pos of matched?.positions ?? []) {
+        if (!push(pos, chord, suffix)) break;
+      }
     }
 
     // Phase 2: algorithmically generated positions
     if (voicings.length < limit) {
       const chordData = getChord(chord.name);
       if (!chordData.empty && chordData.notes.length >= 2) {
-        for (const pos of generateVoicings(chordData.notes)) {
+        for (const pos of generateVoicings(chordData.notes, openMidi)) {
           if (voicings.length >= limit) break;
           push(pos, chord, suffix);
         }

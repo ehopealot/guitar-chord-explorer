@@ -1,6 +1,6 @@
 import {
   MARGIN_LEFT, MARGIN_TOP, NUT_AREA_HEIGHT, STRING_SPACING,
-  FRET_SPACING, NUM_STRINGS, VISIBLE_FRETS, STRING_NAMES,
+  FRET_SPACING, NUM_STRINGS, VISIBLE_FRETS,
 } from '../../constants/guitar';
 
 const NUT_Y = MARGIN_TOP + NUT_AREA_HEIGHT;
@@ -17,9 +17,10 @@ const STRING_COLORS = ['#b89050', '#c09a5a', '#c8a868', '#bfb060', '#c0c0c0', '#
 
 interface FretboardGridProps {
   viewportFret: number;
+  stringNames: readonly string[];
 }
 
-export function FretboardGrid({ viewportFret }: FretboardGridProps) {
+export function FretboardGrid({ viewportFret, stringNames }: FretboardGridProps) {
   const gradId = 'fretboard-wood';
   return (
     <g>
@@ -98,7 +99,7 @@ export function FretboardGrid({ viewportFret }: FretboardGridProps) {
           fill="#999"
           letterSpacing="0.5"
         >
-          {STRING_NAMES[i]}
+          {stringNames[i]}
         </text>
       ))}
 

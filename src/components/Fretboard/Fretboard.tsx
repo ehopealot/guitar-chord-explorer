@@ -11,6 +11,7 @@ import { FretLabel } from './FretLabel';
 interface FretboardProps {
   positions: FretboardPositions;
   viewportFret: number;
+  stringNames: readonly string[];
   onFretClick: (stringIdx: number, fretNum: number) => void;
   onStringHeaderClick: (stringIdx: number) => void;
 }
@@ -20,6 +21,7 @@ const NUT_Y = MARGIN_TOP + NUT_AREA_HEIGHT;
 export function Fretboard({
   positions,
   viewportFret,
+  stringNames,
   onFretClick,
   onStringHeaderClick,
 }: FretboardProps) {
@@ -38,7 +40,7 @@ export function Fretboard({
         .fret-cell .hover-dot { opacity: 0; transition: opacity 0.1s; }
       `}</style>
 
-      <FretboardGrid viewportFret={viewportFret} />
+      <FretboardGrid viewportFret={viewportFret} stringNames={stringNames} />
       <FretLabel viewportFret={viewportFret} />
 
       {/* Clickable cells with hover ghost + selected dots */}
