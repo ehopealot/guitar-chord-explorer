@@ -1,5 +1,19 @@
-import type { NamedVoicing } from '../../types';
+import type { NamedVoicing, VoicingPosition } from '../../types';
 import { resolveAbsoluteFret } from '../../lib/voicingLookup';
+import { playChord } from '../../lib/audioEngine';
+
+const STANDARD_MIDI = [40, 45, 50, 55, 59, 64];
+
+function getMidi(pos: VoicingPosition): number[] {
+  if (pos.midi.length > 0) return pos.midi;
+  return pos.frets
+    .map((f, si) => {
+      if (f === -1) return null;
+      const abs = f === 0 ? 0 : pos.baseFret + f - 1;
+      return STANDARD_MIDI[si] + abs;
+    })
+    .filter((m): m is number => m !== null);
+}
 import {
   MINI_STRING_SPACING, MINI_FRET_SPACING, MINI_DOT_RADIUS,
   MINI_NUT_HEIGHT, MINI_MARGIN_H,
@@ -114,8 +128,18 @@ export function VoicingCard({ voicing }: VoicingCardProps) {
         })}
 
       </svg>
-      <div className="voicing-fret-label" style={{ color: '#999' }}>
-        {position.frets.map((f) => (f === -1 ? 'x' : String(f))).join(' ')}
+      <div className="voicing-card-footer">
+        <div className="voicing-fret-label" style={{ color: '#999' }}>
+          {position.frets.map((f) => (f === -1 ? 'x' : String(f))).join(' ')}
+        </div>
+        <button
+          className="voicing-play-btn"
+          style={{ color }}
+          onClick={(e) => { e.stopPropagation(); playChord(getMidi(position)); }}
+          title="Play"
+        >
+          ▶
+        </button>
       </div>
     </div>
   );

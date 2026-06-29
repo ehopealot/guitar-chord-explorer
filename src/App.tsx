@@ -17,6 +17,7 @@ import { ChordBuilder } from './components/ChordBuilder/ChordBuilder';
 import { TUNINGS, DEFAULT_TUNING } from './constants/tunings';
 import type { Tuning } from './constants/tunings';
 import type { NamedVoicing, SavedProgression } from './types';
+import { playChord } from './lib/audioEngine';
 import './App.css';
 
 const SLIDER_MAX = 15;
@@ -55,6 +56,17 @@ export default function App() {
 
   const displayedVoicings = alternativeVoicings
     .filter((v) => v.position.baseFret >= startFret);
+
+  const fretboardMidi = useMemo(() =>
+    positions
+      .map((pos, si) => {
+        if (pos === null || pos === -1) return null;
+        const sounding = pos === 0 ? capo : pos;
+        return tuning.midi[si] + sounding;
+      })
+      .filter((m): m is number => m !== null),
+    [positions, tuning.midi, capo],
+  );
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -243,6 +255,8 @@ export default function App() {
                       onClear={clearAll}
                       onScrollUp={scrollUp}
                       onScrollDown={scrollDown}
+                      onPlay={() => playChord(fretboardMidi)}
+                      canPlay={fretboardMidi.length > 0}
                       viewportFret={viewportFret}
                     />
                   </div>

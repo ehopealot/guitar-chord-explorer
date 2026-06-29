@@ -184,6 +184,23 @@ body {
   cursor: default;
 }
 
+.btn--play {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.15);
+  color: #7dd3fc;
+  padding: 6px 10px;
+}
+
+.btn--play:hover:not(:disabled) {
+  background: rgba(255,255,255,0.15);
+  color: #38bdf8;
+}
+
+.btn--play:disabled {
+  opacity: 0.2;
+  cursor: default;
+}
+
 .btn--clear {
   background: #fee2e2;
   border-color: #fca5a5;
@@ -386,10 +403,33 @@ body {
   letter-spacing: 0.2px;
 }
 
+.voicing-card-footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
 .voicing-fret-label {
   font-size: 10px;
   letter-spacing: 1px;
-  margin-top: 2px;
+  flex: 1;
+}
+
+.voicing-play-btn {
+  background: none;
+  border: none;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 0 2px;
+  opacity: 0.5;
+  line-height: 1;
+  transition: opacity 0.12s;
+  flex-shrink: 0;
+}
+
+.voicing-play-btn:hover {
+  opacity: 1;
 }
 
 /* ── Progression strip (fixed at bottom) ── */
