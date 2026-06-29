@@ -15,7 +15,7 @@ const GROUPS: { label: string; keys: Key[] }[] = [
   { label: 'Quality',    keys: ['m', 'maj', 'aug', 'dim', '5'] },
   { label: 'Extension',  keys: ['7', '9', '11', '13'] },
   { label: 'Suspension', keys: ['sus2', 'sus4'] },
-  { label: 'Added',      keys: ['6', ['6/9','69'], 'add9', 'add11'] },
+  { label: 'Added',      keys: ['6', ['6/9','69'], 'add9'] },
   { label: 'Altered',    keys: [['b5','b5'],['♯5','#5'],['b9','b9'],['♯9','#9'],['♯11','#11'],['b13','b13']] },
 ];
 

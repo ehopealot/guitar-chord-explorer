@@ -21,7 +21,7 @@ export function useChordDetection(
     [adjustedPositions, tuningMidi],
   );
 
-  const detectedChords = useMemo(() => detectChords(notes), [notes]);
+  const detectedChords = useMemo(() => detectChords(notes, notes[0]), [notes]);
 
   const primaryChord = detectedChords[0] ?? null;
 
