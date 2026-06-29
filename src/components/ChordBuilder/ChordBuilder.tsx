@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { get as getChord } from '@tonaljs/chord';
 import { lookupVoicings } from '../../lib/voicingLookup';
+function isSimpleVoicing(frets: readonly number[]): boolean {
+  return frets.filter(f => f > 0).length <= 3;
+}
 import { DraggableVoicingCard } from '../VoicingCard/DraggableVoicingCard';
 import type { DetectedChord } from '../../types';
 
@@ -22,9 +25,11 @@ const GROUPS: { label: string; keys: Key[] }[] = [
 interface ChordBuilderProps {
   openMidi: readonly number[];
   capo: number;
+  simpleOnly: boolean;
+  onSimpleOnlyChange: (v: boolean) => void;
 }
 
-export function ChordBuilder({ openMidi, capo }: ChordBuilderProps) {
+export function ChordBuilder({ openMidi, capo, simpleOnly, onSimpleOnlyChange }: ChordBuilderProps) {
   const [text, setText] = useState('');
   const [startFret, setStartFret] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -63,7 +68,8 @@ export function ChordBuilder({ openMidi, capo }: ChordBuilderProps) {
   }, [chordInfo, openMidi, capo, text]);
 
   const displayed = allVoicings
-    .filter(v => v.position.baseFret >= startFret);
+    .filter(v => v.position.baseFret >= startFret)
+    .filter(v => !simpleOnly || isSimpleVoicing(v.position.frets));
 
   return (
     <div className="chord-builder">
@@ -121,19 +127,31 @@ export function ChordBuilder({ openMidi, capo }: ChordBuilderProps) {
         <section className="voicings-section">
           <div className="voicings-header">
             <h2>Voicings</h2>
-            <div className="voicings-fret-filter">
-              <label htmlFor="builder-fret-slider">
-                From fret <span className="fret-value">{startFret}</span>
-              </label>
-              <input
-                id="builder-fret-slider"
-                type="range"
-                min={capo}
-                max={SLIDER_MAX}
-                value={startFret}
-                onChange={e => setStartFret(Number(e.target.value))}
-                className="fret-slider"
-              />
+            <div className="voicings-filters">
+              <div className="voicings-fret-filter">
+                <label htmlFor="builder-fret-slider">
+                  From fret <span className="fret-value">{startFret}</span>
+                </label>
+                <input
+                  id="builder-fret-slider"
+                  type="range"
+                  min={capo}
+                  max={SLIDER_MAX}
+                  value={startFret}
+                  onChange={e => setStartFret(Number(e.target.value))}
+                  className="fret-slider"
+                />
+              </div>
+              <div className="complexity-toggle">
+                <button
+                  className={`complexity-btn${!simpleOnly ? ' complexity-btn--active' : ''}`}
+                  onClick={() => onSimpleOnlyChange(false)}
+                >All</button>
+                <button
+                  className={`complexity-btn${simpleOnly ? ' complexity-btn--active' : ''}`}
+                  onClick={() => onSimpleOnlyChange(true)}
+                >Simple</button>
+              </div>
             </div>
           </div>
           {displayed.length > 0 ? (

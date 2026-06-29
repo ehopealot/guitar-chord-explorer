@@ -18,7 +18,13 @@ import { TUNINGS, DEFAULT_TUNING } from './constants/tunings';
 import type { Tuning } from './constants/tunings';
 import type { NamedVoicing, SavedProgression } from './types';
 import { playChord } from './lib/audioEngine';
+import { effectiveFingers } from './lib/voicingGenerator';
 import './App.css';
+
+// Simple = ≤3 strings actually fretted (pressed above the nut)
+function isSimpleVoicing(frets: readonly number[]): boolean {
+  return frets.filter(f => f > 0).length <= 3;
+}
 
 const SLIDER_MAX = 15;
 
@@ -27,6 +33,7 @@ export default function App() {
   const [capo, setCapo] = useState(0);
   const [activeTab, setActiveTab] = useState<'fretboard' | 'builder'>('fretboard');
   const [startFret, setStartFret] = useState(0);
+  const [simpleOnly, setSimpleOnly] = useState(true);
   const [progression, setProgression] = useState<ProgressionItem[]>([]);
   const [activeDrag, setActiveDrag] = useState<NamedVoicing | null>(null);
   const [savedProgressions, setSavedProgressions] = useState<SavedProgression[]>(() => {
@@ -55,7 +62,8 @@ export default function App() {
     useChordDetection(positions, tuning.midi, effectiveMidi, capo);
 
   const displayedVoicings = alternativeVoicings
-    .filter((v) => v.position.baseFret >= startFret);
+    .filter((v) => v.position.baseFret >= startFret)
+    .filter((v) => !simpleOnly || isSimpleVoicing(v.position.frets));
 
   const fretboardMidi = useMemo(() =>
     positions
@@ -275,19 +283,31 @@ export default function App() {
                   <section className="voicings-section">
                     <div className="voicings-header">
                       <h2>Alternative voicings</h2>
-                      <div className="voicings-fret-filter">
-                        <label htmlFor="start-fret-slider">
-                          From fret <span className="fret-value">{startFret}</span>
-                        </label>
-                        <input
-                          id="start-fret-slider"
-                          type="range"
-                          min={capo}
-                          max={SLIDER_MAX}
-                          value={startFret}
-                          onChange={(e) => setStartFret(Number(e.target.value))}
-                          className="fret-slider"
-                        />
+                      <div className="voicings-filters">
+                        <div className="voicings-fret-filter">
+                          <label htmlFor="start-fret-slider">
+                            From fret <span className="fret-value">{startFret}</span>
+                          </label>
+                          <input
+                            id="start-fret-slider"
+                            type="range"
+                            min={capo}
+                            max={SLIDER_MAX}
+                            value={startFret}
+                            onChange={(e) => setStartFret(Number(e.target.value))}
+                            className="fret-slider"
+                          />
+                        </div>
+                        <div className="complexity-toggle">
+                          <button
+                            className={`complexity-btn${!simpleOnly ? ' complexity-btn--active' : ''}`}
+                            onClick={() => setSimpleOnly(false)}
+                          >All</button>
+                          <button
+                            className={`complexity-btn${simpleOnly ? ' complexity-btn--active' : ''}`}
+                            onClick={() => setSimpleOnly(true)}
+                          >Simple</button>
+                        </div>
                       </div>
                     </div>
                     {displayedVoicings.length > 0 ? (
@@ -305,7 +325,12 @@ export default function App() {
             )}
 
             {activeTab === 'builder' && (
-              <ChordBuilder openMidi={effectiveMidi} capo={capo} />
+              <ChordBuilder
+                openMidi={effectiveMidi}
+                capo={capo}
+                simpleOnly={simpleOnly}
+                onSimpleOnlyChange={setSimpleOnly}
+              />
             )}
           </main>
         </div>

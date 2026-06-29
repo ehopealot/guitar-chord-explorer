@@ -52,14 +52,18 @@ export function detectChords(notes: string[], bassNote?: string): DetectedChord[
     })
     .filter((c): c is DetectedChord => c !== null)
     .sort((a, b) => {
-      const aBass = bassNote && a.tonic === bassNote ? 0 : 1;
-      const bBass = bassNote && b.tonic === bassNote ? 0 : 1;
-      if (aBass !== bBass) return aBass - bBass;
-      // Slash chord whose bass matches ranks just below root-match
-      const aSlash = bassNote && a.displayName.endsWith(`/${bassNote}`) ? 0 : 1;
-      const bSlash = bassNote && b.displayName.endsWith(`/${bassNote}`) ? 0 : 1;
-      if (aSlash !== bSlash) return aSlash - bSlash;
-      return typeComplexity(a.type) - typeComplexity(b.type);
+      // Primary: simpler chord types first (G/B beats Bm#5)
+      const ca = typeComplexity(a.type);
+      const cb = typeComplexity(b.type);
+      if (ca !== cb) return ca - cb;
+      // Tiebreaker: prefer bass-rooted, then slash-bass, then unrelated
+      const bassRank = (c: DetectedChord) => {
+        if (!bassNote) return 2;
+        if (c.tonic === bassNote) return 0;
+        if (c.displayName.endsWith(`/${bassNote}`)) return 1;
+        return 2;
+      };
+      return bassRank(a) - bassRank(b);
     });
 
   // If the top chord's root doesn't match the bass, synthesize a slash version

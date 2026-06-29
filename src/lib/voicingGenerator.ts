@@ -17,9 +17,28 @@ export function effectiveFingers(absFrets: number[]): number {
   const fretted = absFrets.filter((f) => f > 0);
   if (fretted.length === 0) return 0;
   const minF = Math.min(...fretted);
-  const atMin = fretted.filter((f) => f === minF).length;
-  const distinctAbove = new Set(fretted.filter((f) => f > minF)).size;
-  return (atMin >= 2 ? 1 : atMin) + distinctAbove;
+
+  // Count contiguous groups of strings at a given fret value.
+  // isMin=true: a barre at the lowest fret can span over higher-fretted strings
+  //   (those fingers override it), so only open strings (0) break the span.
+  // isMin=false: any string that isn't muted (-1) breaks a partial barre.
+  function countGroups(fretValue: number, isMin: boolean): number {
+    let groups = 0;
+    let inGroup = false;
+    for (const f of absFrets) {
+      if (f === fretValue) {
+        if (!inGroup) { groups++; inGroup = true; }
+      } else {
+        const breaks = isMin ? f === 0 : f !== -1;
+        if (breaks) inGroup = false;
+      }
+    }
+    return groups;
+  }
+
+  const distinctAboveFrets = [...new Set(fretted.filter((f) => f > minF))];
+  const aboveFingers = distinctAboveFrets.reduce((sum, fv) => sum + countGroups(fv, false), 0);
+  return countGroups(minF, true) + aboveFingers;
 }
 
 // Reject voicings whose fret sequence zigzags in both directions —
@@ -45,7 +64,7 @@ const WINDOW_SIZE = 4;    // each window spans [w, w+3]
 const MAX_SPAN = 3;        // max - min of fretted notes ≤ 3
 const MAX_WINDOW_START = 17;
 const MIN_SOUNDING = 4;   // at least 4 strings must sound
-const MAX_FINGERS = 3;    // effective finger placements ≤ 3
+const MAX_FINGERS = 4;
 
 export function generateVoicings(
   chordNotes: string[],
