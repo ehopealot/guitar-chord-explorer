@@ -19,7 +19,7 @@ export const NUT_AREA_HEIGHT = 50;
 export const MARGIN_LEFT = 88;
 export const MARGIN_RIGHT = 28;
 export const MARGIN_TOP = 16;
-export const MARGIN_BOTTOM = 16;
+export const MARGIN_BOTTOM = 36;
 
 export const SVG_WIDTH =
   MARGIN_LEFT + (NUM_STRINGS - 1) * STRING_SPACING + MARGIN_RIGHT;

@@ -409,15 +409,105 @@ body {
 }
 
 .progression-inner {
-  max-width: 748px;
+  max-width: 900px;
   margin: 0 auto;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.progression-main {
+  flex: 1;
+  min-width: 0;
 }
 
 .progression-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 8px;
   margin-bottom: 8px;
+}
+
+.progression-name-input {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 5px 10px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 7px;
+  background: #fff;
+  color: #222;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.progression-name-input:focus {
+  border-color: #2563eb;
+}
+
+.progression-bar-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.btn--save-prog {
+  padding: 5px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn--save-prog:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.btn--save-prog:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.btn--clear-prog {
+  padding: 5px 10px;
+  font-size: 13px;
+  font-weight: 500;
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn--clear-prog:hover {
+  background: #fecaca;
+}
+
+.btn--done-prog {
+  padding: 5px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  background: #f3f4f6;
+  color: #333;
+  border: 1px solid #d1d5db;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn--done-prog:hover:not(:disabled) {
+  background: #e5e7eb;
+}
+
+.btn--done-prog:disabled {
+  opacity: 0.35;
+  cursor: default;
 }
 
 .progression-title {
@@ -635,4 +725,90 @@ body {
 
 .builder-chord-name--unknown {
   color: #e53e3e;
+}
+
+/* ── Progression library ── */
+
+.progression-library {
+  width: 172px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.library-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: #aaa;
+}
+
+.library-empty {
+  font-size: 12px;
+  color: #ccc;
+}
+
+.library-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 120px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #ddd transparent;
+}
+
+.library-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.library-item-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: #444;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 4px 8px;
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.library-item-name:hover {
+  background: #e5e7eb;
+  border-color: #d1d5db;
+}
+
+.library-item-delete {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: #f3f4f6;
+  color: #999;
+  font-size: 14px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.12s, color 0.12s;
+}
+
+.library-item-delete:hover {
+  background: #dc2626;
+  color: #fff;
 }

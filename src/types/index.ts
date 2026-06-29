@@ -29,3 +29,9 @@ export interface DetectedChord {
   aliases: string[];
   displayName: string;
 }
+
+export interface SavedProgression {
+  id: string;
+  name: string;
+  items: { uid: string; voicing: NamedVoicing }[];
+}

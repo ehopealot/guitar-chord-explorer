@@ -16,7 +16,7 @@ import type { ProgressionItem } from './components/Progression/ProgressionArea';
 import { ChordBuilder } from './components/ChordBuilder/ChordBuilder';
 import { TUNINGS, DEFAULT_TUNING } from './constants/tunings';
 import type { Tuning } from './constants/tunings';
-import type { NamedVoicing } from './types';
+import type { NamedVoicing, SavedProgression } from './types';
 import './App.css';
 
 const SLIDER_MAX = 15;
@@ -28,6 +28,12 @@ export default function App() {
   const [startFret, setStartFret] = useState(0);
   const [progression, setProgression] = useState<ProgressionItem[]>([]);
   const [activeDrag, setActiveDrag] = useState<NamedVoicing | null>(null);
+  const [savedProgressions, setSavedProgressions] = useState<SavedProgression[]>(() => {
+    try { return JSON.parse(localStorage.getItem('guitar-chord-progressions') ?? '[]'); }
+    catch { return []; }
+  });
+  const [progressionName, setProgressionName] = useState('New Progression');
+  const [activeProgressionId, setActiveProgressionId] = useState<string | null>(null);
 
   const effectiveMidi = useMemo(
     () => tuning.midi.map(m => m + capo) as unknown as readonly number[],
@@ -100,6 +106,57 @@ export default function App() {
           return arrayMove(prev, oldIdx, newIdx);
         });
       }
+    }
+  }
+
+  function handleSaveProgression() {
+    let newSaved: SavedProgression[];
+    if (activeProgressionId) {
+      newSaved = savedProgressions.map((p) =>
+        p.id === activeProgressionId ? { ...p, name: progressionName, items: progression } : p
+      );
+    } else {
+      const id = `${Date.now()}`;
+      newSaved = [...savedProgressions, { id, name: progressionName, items: progression }];
+      setActiveProgressionId(id);
+    }
+    setSavedProgressions(newSaved);
+    localStorage.setItem('guitar-chord-progressions', JSON.stringify(newSaved));
+  }
+
+  function handleLoadProgression(saved: SavedProgression) {
+    setProgression(saved.items.map((item) => ({
+      ...item,
+      uid: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    })));
+    setProgressionName(saved.name);
+    setActiveProgressionId(saved.id);
+  }
+
+  function handleDoneProgression() {
+    let newSaved: SavedProgression[];
+    if (activeProgressionId) {
+      newSaved = savedProgressions.map((p) =>
+        p.id === activeProgressionId ? { ...p, name: progressionName, items: progression } : p
+      );
+    } else {
+      newSaved = [...savedProgressions, { id: `${Date.now()}`, name: progressionName, items: progression }];
+    }
+    setSavedProgressions(newSaved);
+    localStorage.setItem('guitar-chord-progressions', JSON.stringify(newSaved));
+    setProgression([]);
+    setActiveProgressionId(null);
+    setProgressionName('New Progression');
+  }
+
+  function handleDeleteSavedProgression(id: string) {
+    const newSaved = savedProgressions.filter((p) => p.id !== id);
+    setSavedProgressions(newSaved);
+    localStorage.setItem('guitar-chord-progressions', JSON.stringify(newSaved));
+    if (activeProgressionId === id) {
+      setProgression([]);
+      setActiveProgressionId(null);
+      setProgressionName('New Progression');
     }
   }
 
@@ -243,6 +300,13 @@ export default function App() {
           items={progression}
           onRemove={(uid) => setProgression((prev) => prev.filter((p) => p.uid !== uid))}
           onClear={() => setProgression([])}
+          progressionName={progressionName}
+          onNameChange={setProgressionName}
+          onSave={handleSaveProgression}
+          onDone={handleDoneProgression}
+          savedProgressions={savedProgressions}
+          onLoad={handleLoadProgression}
+          onDeleteSaved={handleDeleteSavedProgression}
         />
 
         <DragOverlay dropAnimation={null}>
