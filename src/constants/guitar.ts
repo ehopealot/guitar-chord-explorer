@@ -12,14 +12,14 @@ export const VISIBLE_FRETS = 5;
 export const MAX_FRET = 20;
 
 // SVG layout — main interactive fretboard
-export const STRING_SPACING = 44;
-export const FRET_SPACING = 58;
-export const FRET_DOT_RADIUS = 15;
-export const NUT_AREA_HEIGHT = 44;
-export const MARGIN_LEFT = 48;
-export const MARGIN_RIGHT = 24;
-export const MARGIN_TOP = 12;
-export const MARGIN_BOTTOM = 12;
+export const STRING_SPACING = 54;
+export const FRET_SPACING = 70;
+export const FRET_DOT_RADIUS = 17;
+export const NUT_AREA_HEIGHT = 50;
+export const MARGIN_LEFT = 88;
+export const MARGIN_RIGHT = 28;
+export const MARGIN_TOP = 16;
+export const MARGIN_BOTTOM = 16;
 
 export const SVG_WIDTH =
   MARGIN_LEFT + (NUM_STRINGS - 1) * STRING_SPACING + MARGIN_RIGHT;

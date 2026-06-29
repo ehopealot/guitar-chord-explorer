@@ -1,6 +1,6 @@
 import {
   MARGIN_LEFT, MARGIN_TOP, NUT_AREA_HEIGHT,
-  STRING_SPACING, NUM_STRINGS, FRET_SPACING,
+  STRING_SPACING, NUM_STRINGS,
 } from '../../constants/guitar';
 
 const NUT_Y = MARGIN_TOP + NUT_AREA_HEIGHT;
@@ -12,29 +12,29 @@ interface FretLabelProps {
 
 export function FretLabel({ viewportFret }: FretLabelProps) {
   if (viewportFret === 1) {
-    // Draw the nut
     return (
-      <rect
-        x={MARGIN_LEFT - 2}
-        y={NUT_Y - 5}
-        width={FRETBOARD_WIDTH + 4}
-        height={6}
-        rx={2}
-        fill="#2a2a2a"
-      />
+      <g>
+        {/* Nut shadow */}
+        <rect
+          x={MARGIN_LEFT - 3}
+          y={NUT_Y - 1}
+          width={FRETBOARD_WIDTH + 6}
+          height={9}
+          rx={2}
+          fill="rgba(0,0,0,0.25)"
+        />
+        {/* Nut body — bone/ivory color */}
+        <rect
+          x={MARGIN_LEFT - 3}
+          y={NUT_Y - 7}
+          width={FRETBOARD_WIDTH + 6}
+          height={8}
+          rx={2}
+          fill="#e8d5a8"
+        />
+      </g>
     );
   }
 
-  return (
-    <text
-      x={MARGIN_LEFT - 8}
-      y={MARGIN_TOP + NUT_AREA_HEIGHT + FRET_SPACING * 0.5}
-      textAnchor="end"
-      dominantBaseline="central"
-      fontSize={12}
-      fill="#666"
-    >
-      {viewportFret}fr
-    </text>
-  );
+  return null; // fret numbers are now handled in FretboardGrid
 }

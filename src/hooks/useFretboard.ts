@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import type { FretboardPositions } from '../types';
 import { VISIBLE_FRETS, MAX_FRET } from '../constants/guitar';
 
-const INITIAL: FretboardPositions = [null, null, null, null, null, null];
+const INITIAL: FretboardPositions = [0, 0, 0, 0, 0, 0];
 
 export function useFretboard() {
   const [positions, setPositions] = useState<FretboardPositions>(INITIAL);

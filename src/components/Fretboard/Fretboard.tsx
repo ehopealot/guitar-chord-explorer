@@ -33,7 +33,48 @@ export function Fretboard({
       height={SVG_HEIGHT}
       style={{ userSelect: 'none', display: 'block' }}
     >
+      <style>{`
+        .fret-cell:hover .hover-dot { opacity: 1; }
+        .fret-cell .hover-dot { opacity: 0; transition: opacity 0.1s; }
+      `}</style>
+
+      <FretboardGrid viewportFret={viewportFret} />
       <FretLabel viewportFret={viewportFret} />
+
+      {/* Clickable cells with hover ghost + selected dots */}
+      {Array.from({ length: VISIBLE_FRETS }, (_, fi) => {
+        const actualFret = viewportFret + fi;
+        return Array.from({ length: NUM_STRINGS }, (_, si) => {
+          const x = getX(si);
+          const y = getY(fi + 1);
+          const isSelected = positions[si] === actualFret;
+          return (
+            <g key={`${si}-${fi}`} className="fret-cell" onClick={() => onFretClick(si, actualFret)} style={{ cursor: 'pointer' }}>
+              {/* Hit area */}
+              <rect
+                x={x - STRING_SPACING / 2}
+                y={NUT_Y + fi * FRET_SPACING}
+                width={STRING_SPACING}
+                height={FRET_SPACING}
+                fill="transparent"
+              />
+              {/* Hover ghost dot */}
+              {!isSelected && (
+                <circle
+                  className="hover-dot"
+                  cx={x}
+                  cy={y}
+                  r={FRET_DOT_RADIUS}
+                  fill="rgba(255,255,255,0.18)"
+                />
+              )}
+              {isSelected && (
+                <FingerDot x={x} y={y} radius={FRET_DOT_RADIUS} color="#2563eb" />
+              )}
+            </g>
+          );
+        });
+      })}
 
       {/* String headers: click to cycle open/muted/unplayed */}
       {Array.from({ length: NUM_STRINGS }, (_, i) => (
@@ -46,34 +87,6 @@ export function Fretboard({
           onClick={() => onStringHeaderClick(i)}
         />
       ))}
-
-      <FretboardGrid viewportFret={viewportFret} />
-
-      {/* Clickable cells and selected dots */}
-      {Array.from({ length: VISIBLE_FRETS }, (_, fi) => {
-        const actualFret = viewportFret + fi;
-        return Array.from({ length: NUM_STRINGS }, (_, si) => {
-          const x = getX(si);
-          const y = getY(fi + 1);
-          const isSelected = positions[si] === actualFret;
-          return (
-            <g key={`${si}-${fi}`}>
-              <rect
-                x={x - STRING_SPACING / 2}
-                y={NUT_Y + fi * FRET_SPACING}
-                width={STRING_SPACING}
-                height={FRET_SPACING}
-                fill="transparent"
-                style={{ cursor: 'pointer' }}
-                onClick={() => onFretClick(si, actualFret)}
-              />
-              {isSelected && (
-                <FingerDot x={x} y={y} radius={FRET_DOT_RADIUS} color="#2563eb" />
-              )}
-            </g>
-          );
-        });
-      })}
     </svg>
   );
 }
