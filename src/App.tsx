@@ -18,7 +18,6 @@ import { TUNINGS, DEFAULT_TUNING } from './constants/tunings';
 import type { Tuning } from './constants/tunings';
 import type { NamedVoicing, SavedProgression } from './types';
 import { playChord } from './lib/audioEngine';
-import { effectiveFingers } from './lib/voicingGenerator';
 import './App.css';
 
 // Simple = ≤3 strings actually fretted (pressed above the nut)
