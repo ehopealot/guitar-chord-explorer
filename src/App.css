@@ -1,3 +1,59 @@
+/* ── Color tokens ── */
+
+:root {
+  --bg:               #f8f9fa;
+  --bg-card:          #ffffff;
+  --bg-subtle:        #f3f4f6;
+  --bg-subtle-hover:  #e5e7eb;
+  --bg-muted:         #fafafa;
+  --bg-tab-bar:       #f0f0f0;
+  --bg-progression:   rgba(255,255,255,0.97);
+  --text:             #1a1a1a;
+  --text-strong:      #111111;
+  --text-muted:       #555555;
+  --text-faint:       #888888;
+  --text-placeholder: #aaaaaa;
+  --border:           #e5e7eb;
+  --border-input:     #e0e0e0;
+  --border-subtle:    #dddddd;
+  --border-strong:    #d1d5db;
+  --accent:           #2563eb;
+  --accent-hover:     #1d4ed8;
+  --danger-bg:        #fee2e2;
+  --danger-border:    #fca5a5;
+  --danger-text:      #dc2626;
+  --danger-hover-bg:  #fecaca;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:               #0f0f10;
+    --bg-card:          #1c1c1e;
+    --bg-subtle:        #2c2c2e;
+    --bg-subtle-hover:  #3a3a3c;
+    --bg-muted:         #161618;
+    --bg-tab-bar:       #2c2c2e;
+    --bg-progression:   rgba(16,16,18,0.97);
+    --text:             #ececec;
+    --text-strong:      #ffffff;
+    --text-muted:       #a0a0a8;
+    --text-faint:       #66666e;
+    --text-placeholder: #505058;
+    --border:           #2c2c2e;
+    --border-input:     #38383a;
+    --border-subtle:    #38383a;
+    --border-strong:    #48484a;
+    --accent:           #3b82f6;
+    --accent-hover:     #2563eb;
+    --danger-bg:        #3d1515;
+    --danger-border:    #7f1d1d;
+    --danger-text:      #f87171;
+    --danger-hover-bg:  #4d1a1a;
+  }
+}
+
+/* ── Reset ── */
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -6,8 +62,8 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-  background: #f8f9fa;
-  color: #1a1a1a;
+  background: var(--bg);
+  color: var(--text);
   min-height: 100vh;
 }
 
@@ -25,7 +81,7 @@ body {
 .app-header h1 {
   font-size: 26px;
   font-weight: 700;
-  color: #111;
+  color: var(--text-strong);
 }
 
 /* ── Global controls bar (tuning + tabs) ── */
@@ -44,7 +100,7 @@ body {
 .tab-bar {
   display: flex;
   gap: 4px;
-  background: #f0f0f0;
+  background: var(--bg-tab-bar);
   border-radius: 8px;
   padding: 3px;
 }
@@ -53,7 +109,7 @@ body {
   padding: 6px 16px;
   font-size: 13px;
   font-weight: 500;
-  color: #666;
+  color: var(--text-faint);
   background: transparent;
   border: none;
   border-radius: 6px;
@@ -63,15 +119,15 @@ body {
 }
 
 .tab-btn:hover {
-  color: #333;
-  background: rgba(0,0,0,0.06);
+  color: var(--text-muted);
+  background: rgba(128,128,128,0.1);
 }
 
 .tab-btn--active {
-  background: #fff;
-  color: #111;
+  background: var(--bg-card);
+  color: var(--text-strong);
   font-weight: 600;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
 
 /* ── Tuning + Capo selectors ── */
@@ -92,16 +148,16 @@ body {
 .tuning-label {
   font-size: 13px;
   font-weight: 600;
-  color: #666;
+  color: var(--text-faint);
   text-transform: uppercase;
   letter-spacing: 0.6px;
 }
 
 .tuning-select {
   font-size: 14px;
-  color: #222;
-  background: #fff;
-  border: 1.5px solid #ddd;
+  color: var(--text-strong);
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-subtle);
   border-radius: 7px;
   padding: 6px 28px 6px 10px;
   appearance: none;
@@ -114,12 +170,12 @@ body {
 }
 
 .tuning-select:hover {
-  border-color: #aaa;
+  border-color: var(--border-strong);
 }
 
 .tuning-select:focus {
   outline: none;
-  border-color: #2563eb;
+  border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
 }
 
@@ -146,10 +202,10 @@ body {
 
 .fretboard-hint {
   font-size: 12px;
-  color: #aaa;
+  color: var(--text-placeholder);
 }
 
-/* ── Controls ── */
+/* ── Controls (inside dark fretboard container — keep light-on-dark) ── */
 
 .controls {
   display: flex;
@@ -158,7 +214,7 @@ body {
 }
 
 .btn {
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-strong);
   border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
@@ -202,14 +258,14 @@ body {
 }
 
 .btn--clear {
-  background: #fee2e2;
-  border-color: #fca5a5;
-  color: #dc2626;
+  background: var(--danger-bg);
+  border-color: var(--danger-border);
+  color: var(--danger-text);
   padding: 6px 10px;
 }
 
 .btn--clear:hover {
-  background: #fecaca;
+  background: var(--danger-hover-bg);
 }
 
 /* ── Chord display ── */
@@ -217,8 +273,8 @@ body {
 .chord-display {
   text-align: center;
   padding: 20px;
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
   border-radius: 12px;
   margin-bottom: 28px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.06);
@@ -232,7 +288,7 @@ body {
 .chord-display--empty p,
 .chord-display--partial p,
 .chord-display--unknown p {
-  color: #aaa;
+  color: var(--text-placeholder);
   font-size: 14px;
 }
 
@@ -246,28 +302,28 @@ body {
 .chord-name {
   font-size: 32px;
   font-weight: 700;
-  color: #111;
+  color: var(--text-strong);
 }
 
 .chord-notes-inline {
   font-size: 13px;
-  color: #999;
+  color: var(--text-faint);
   letter-spacing: 0.5px;
 }
 
 .chord-notes {
   font-size: 14px;
-  color: #555;
+  color: var(--text-muted);
 }
 
 .chord-hint {
   font-size: 13px;
-  color: #bbb;
+  color: var(--text-placeholder);
 }
 
 .chord-alternatives {
   font-size: 13px;
-  color: #888;
+  color: var(--text-faint);
   display: flex;
   gap: 6px;
   justify-content: center;
@@ -275,14 +331,14 @@ body {
 }
 
 .chord-also {
-  color: #aaa;
+  color: var(--text-placeholder);
 }
 
 .chord-alt-name {
-  background: #f3f4f6;
+  background: var(--bg-subtle);
   border-radius: 4px;
   padding: 2px 7px;
-  color: #555;
+  color: var(--text-muted);
 }
 
 /* ── Voicings section ── */
@@ -299,7 +355,7 @@ body {
 .voicings-section h2 {
   font-size: 15px;
   font-weight: 600;
-  color: #555;
+  color: var(--text-faint);
   text-transform: uppercase;
   letter-spacing: 0.8px;
   margin: 0;
@@ -318,9 +374,15 @@ body {
   gap: 10px;
 }
 
+.voicings-fret-filter label {
+  font-size: 13px;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
 .complexity-toggle {
   display: flex;
-  border: 1.5px solid #ddd;
+  border: 1.5px solid var(--border-subtle);
   border-radius: 6px;
   overflow: hidden;
 }
@@ -328,8 +390,8 @@ body {
 .complexity-btn {
   padding: 4px 12px;
   border: none;
-  background: #f5f5f5;
-  color: #777;
+  background: var(--bg-subtle);
+  color: var(--text-faint);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -337,28 +399,22 @@ body {
 }
 
 .complexity-btn + .complexity-btn {
-  border-left: 1.5px solid #ddd;
+  border-left: 1.5px solid var(--border-subtle);
 }
 
 .complexity-btn--active {
-  background: #3b82f6;
+  background: var(--accent);
   color: #fff;
 }
 
 .complexity-btn:hover:not(.complexity-btn--active) {
-  background: #eee;
-  color: #444;
-}
-
-.voicings-fret-filter label {
-  font-size: 13px;
-  color: #888;
-  white-space: nowrap;
+  background: var(--bg-subtle-hover);
+  color: var(--text-muted);
 }
 
 .fret-value {
   font-weight: 700;
-  color: #444;
+  color: var(--text-muted);
   display: inline-block;
   min-width: 18px;
   text-align: right;
@@ -370,7 +426,7 @@ body {
   width: 140px;
   height: 4px;
   border-radius: 2px;
-  background: #ddd;
+  background: var(--border-subtle);
   outline: none;
   cursor: pointer;
 }
@@ -381,14 +437,14 @@ body {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: #2563eb;
+  background: var(--accent);
   cursor: pointer;
   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
   transition: background 0.15s;
 }
 
 .fret-slider::-webkit-slider-thumb:hover {
-  background: #1d4ed8;
+  background: var(--accent-hover);
 }
 
 .fret-slider::-moz-range-thumb {
@@ -396,13 +452,13 @@ body {
   height: 16px;
   border-radius: 50%;
   border: none;
-  background: #2563eb;
+  background: var(--accent);
   cursor: pointer;
 }
 
 .voicings-empty {
   text-align: center;
-  color: #bbb;
+  color: var(--text-placeholder);
   font-size: 14px;
   padding: 20px 0;
 }
@@ -421,8 +477,8 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  background: #fff;
-  border: 2px solid #ccc;
+  background: var(--bg-card);
+  border: 2px solid var(--border-subtle);
   border-radius: 10px;
   padding: 10px 10px 8px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.06);
@@ -432,7 +488,7 @@ body {
 
 .voicing-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
 .voicing-card-label {
@@ -479,11 +535,11 @@ body {
   left: 0;
   right: 0;
   z-index: 200;
-  background: rgba(255, 255, 255, 0.97);
+  background: var(--bg-progression);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border-top: 1.5px solid #e5e7eb;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.09);
+  border-top: 1.5px solid var(--border);
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.12);
   padding: 8px 16px 12px;
 }
 
@@ -513,16 +569,16 @@ body {
   font-size: 13px;
   font-weight: 500;
   padding: 5px 10px;
-  border: 1.5px solid #e0e0e0;
+  border: 1.5px solid var(--border-input);
   border-radius: 7px;
-  background: #fff;
-  color: #222;
+  background: var(--bg-card);
+  color: var(--text);
   outline: none;
   transition: border-color 0.15s;
 }
 
 .progression-name-input:focus {
-  border-color: #2563eb;
+  border-color: var(--accent);
 }
 
 .progression-bar-actions {
@@ -535,7 +591,7 @@ body {
   padding: 5px 12px;
   font-size: 13px;
   font-weight: 600;
-  background: #2563eb;
+  background: var(--accent);
   color: #fff;
   border: none;
   border-radius: 7px;
@@ -544,7 +600,7 @@ body {
 }
 
 .btn--save-prog:hover:not(:disabled) {
-  background: #1d4ed8;
+  background: var(--accent-hover);
 }
 
 .btn--save-prog:disabled {
@@ -556,32 +612,32 @@ body {
   padding: 5px 10px;
   font-size: 13px;
   font-weight: 500;
-  background: #fee2e2;
-  color: #dc2626;
-  border: 1px solid #fca5a5;
+  background: var(--danger-bg);
+  color: var(--danger-text);
+  border: 1px solid var(--danger-border);
   border-radius: 7px;
   cursor: pointer;
   transition: background 0.15s;
 }
 
 .btn--clear-prog:hover {
-  background: #fecaca;
+  background: var(--danger-hover-bg);
 }
 
 .btn--done-prog {
   padding: 5px 12px;
   font-size: 13px;
   font-weight: 600;
-  background: #f3f4f6;
-  color: #333;
-  border: 1px solid #d1d5db;
+  background: var(--bg-subtle);
+  color: var(--text);
+  border: 1px solid var(--border-strong);
   border-radius: 7px;
   cursor: pointer;
   transition: background 0.15s;
 }
 
 .btn--done-prog:hover:not(:disabled) {
-  background: #e5e7eb;
+  background: var(--bg-subtle-hover);
 }
 
 .btn--done-prog:disabled {
@@ -594,7 +650,7 @@ body {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.9px;
-  color: #888;
+  color: var(--text-faint);
 }
 
 .progression-area {
@@ -605,13 +661,13 @@ body {
   overflow-y: hidden;
   padding: 10px 12px;
   min-height: 60px;
-  border: 2px dashed #e0e0e0;
+  border: 2px dashed var(--border-input);
   border-radius: 10px;
-  background: #fafafa;
+  background: var(--bg-muted);
   align-items: center;
   transition: border-color 0.15s, background 0.15s;
   scrollbar-width: thin;
-  scrollbar-color: #ddd transparent;
+  scrollbar-color: var(--border-subtle) transparent;
 }
 
 .progression-area::-webkit-scrollbar {
@@ -623,18 +679,18 @@ body {
 }
 
 .progression-area::-webkit-scrollbar-thumb {
-  background: #ddd;
+  background: var(--border-subtle);
   border-radius: 2px;
 }
 
 .progression-area--over {
-  border-color: #2563eb;
-  background: rgba(37, 99, 235, 0.04);
+  border-color: var(--accent);
+  background: rgba(37,99,235,0.06);
 }
 
 .progression-placeholder {
   font-size: 13px;
-  color: #c0c0c0;
+  color: var(--text-placeholder);
   pointer-events: none;
   user-select: none;
   white-space: nowrap;
@@ -654,8 +710,8 @@ body {
   height: 20px;
   border-radius: 50%;
   border: none;
-  background: #e5e7eb;
-  color: #555;
+  background: var(--bg-subtle);
+  color: var(--text-muted);
   font-size: 14px;
   line-height: 1;
   display: flex;
@@ -667,14 +723,14 @@ body {
 }
 
 .progression-remove:hover {
-  background: #dc2626;
+  background: var(--danger-text);
   color: #fff;
 }
 
 /* Floating card shown during drag */
 .drag-overlay-card {
   transform: scale(1.06);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.25);
   border-radius: 10px;
   cursor: grabbing;
   opacity: 0.96;
@@ -699,10 +755,10 @@ body {
   font-size: 22px;
   font-weight: 600;
   padding: 12px 44px 12px 16px;
-  border: 2px solid #e0e0e0;
+  border: 2px solid var(--border-input);
   border-radius: 10px;
-  background: #fff;
-  color: #111;
+  background: var(--bg-card);
+  color: var(--text-strong);
   outline: none;
   letter-spacing: 0.5px;
   transition: border-color 0.15s;
@@ -711,11 +767,11 @@ body {
 .chord-input::placeholder {
   font-weight: 400;
   font-size: 16px;
-  color: #bbb;
+  color: var(--text-placeholder);
 }
 
 .chord-input:focus {
-  border-color: #2563eb;
+  border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
 }
 
@@ -725,14 +781,14 @@ body {
   background: none;
   border: none;
   font-size: 20px;
-  color: #aaa;
+  color: var(--text-placeholder);
   cursor: pointer;
   line-height: 1;
   padding: 4px;
   transition: color 0.12s;
 }
 
-.chord-input-clear:hover { color: #555; }
+.chord-input-clear:hover { color: var(--text-muted); }
 
 .builder-chord-info {
   display: flex;
@@ -740,19 +796,23 @@ body {
   gap: 12px;
 }
 
-.builder-chord-info--unknown .builder-chord-name {
-  color: #e53e3e;
-}
-
 .builder-chord-name {
   font-size: 22px;
   font-weight: 700;
-  color: #111;
+  color: var(--text-strong);
+}
+
+.builder-chord-name--unknown {
+  color: var(--danger-text);
+}
+
+.builder-chord-info--unknown .builder-chord-name {
+  color: var(--danger-text);
 }
 
 .builder-chord-notes {
   font-size: 14px;
-  color: #888;
+  color: var(--text-faint);
 }
 
 .builder-keyboard {
@@ -773,7 +833,7 @@ body {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.7px;
-  color: #aaa;
+  color: var(--text-placeholder);
   width: 72px;
   flex-shrink: 0;
 }
@@ -788,9 +848,9 @@ body {
   padding: 7px 14px;
   font-size: 13px;
   font-weight: 500;
-  color: #444;
-  background: #f3f4f6;
-  border: 1.5px solid #e5e7eb;
+  color: var(--text-muted);
+  background: var(--bg-subtle);
+  border: 1.5px solid var(--border);
   border-radius: 7px;
   cursor: pointer;
   transition: background 0.12s, color 0.12s, border-color 0.12s;
@@ -798,12 +858,8 @@ body {
 }
 
 .builder-btn:hover {
-  background: #e5e7eb;
-  border-color: #d1d5db;
-}
-
-.builder-chord-name--unknown {
-  color: #e53e3e;
+  background: var(--bg-subtle-hover);
+  border-color: var(--border-strong);
 }
 
 /* ── Progression library ── */
@@ -821,12 +877,12 @@ body {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.7px;
-  color: #aaa;
+  color: var(--text-placeholder);
 }
 
 .library-empty {
   font-size: 12px;
-  color: #ccc;
+  color: var(--text-placeholder);
 }
 
 .library-list {
@@ -837,7 +893,7 @@ body {
   max-height: 120px;
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: #ddd transparent;
+  scrollbar-color: var(--border-subtle) transparent;
 }
 
 .library-item {
@@ -851,9 +907,9 @@ body {
   min-width: 0;
   font-size: 12px;
   font-weight: 500;
-  color: #444;
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
+  color: var(--text-muted);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
   border-radius: 6px;
   padding: 4px 8px;
   text-align: left;
@@ -865,8 +921,8 @@ body {
 }
 
 .library-item-name:hover {
-  background: #e5e7eb;
-  border-color: #d1d5db;
+  background: var(--bg-subtle-hover);
+  border-color: var(--border-strong);
 }
 
 .library-item-delete {
@@ -875,8 +931,8 @@ body {
   height: 22px;
   border-radius: 50%;
   border: none;
-  background: #f3f4f6;
-  color: #999;
+  background: var(--bg-subtle);
+  color: var(--text-faint);
   font-size: 14px;
   line-height: 1;
   display: flex;
@@ -888,6 +944,6 @@ body {
 }
 
 .library-item-delete:hover {
-  background: #dc2626;
+  background: var(--danger-text);
   color: #fff;
 }
