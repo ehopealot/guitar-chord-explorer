@@ -41,6 +41,8 @@ export default function App() {
   });
   const [progressionName, setProgressionName] = useState('New Progression');
   const [activeProgressionId, setActiveProgressionId] = useState<string | null>(null);
+  const [bpm, setBpm] = useState(80);
+  const [beatsPerMeasure, setBeatsPerMeasure] = useState(4);
 
   const effectiveMidi = useMemo(
     () => tuning.midi.map(m => m + capo) as unknown as readonly number[],
@@ -129,14 +131,15 @@ export default function App() {
   }
 
   function handleSaveProgression() {
+    const snapshot = { name: progressionName, items: progression, bpm, beatsPerMeasure };
     let newSaved: SavedProgression[];
     if (activeProgressionId) {
       newSaved = savedProgressions.map((p) =>
-        p.id === activeProgressionId ? { ...p, name: progressionName, items: progression } : p
+        p.id === activeProgressionId ? { ...p, ...snapshot } : p
       );
     } else {
       const id = `${Date.now()}`;
-      newSaved = [...savedProgressions, { id, name: progressionName, items: progression }];
+      newSaved = [...savedProgressions, { id, ...snapshot }];
       setActiveProgressionId(id);
     }
     setSavedProgressions(newSaved);
@@ -150,22 +153,34 @@ export default function App() {
     })));
     setProgressionName(saved.name);
     setActiveProgressionId(saved.id);
+    if (saved.bpm) setBpm(saved.bpm);
+    if (saved.beatsPerMeasure) setBeatsPerMeasure(saved.beatsPerMeasure);
   }
 
   function handleDoneProgression() {
+    const snapshot = { name: progressionName, items: progression, bpm, beatsPerMeasure };
     let newSaved: SavedProgression[];
     if (activeProgressionId) {
       newSaved = savedProgressions.map((p) =>
-        p.id === activeProgressionId ? { ...p, name: progressionName, items: progression } : p
+        p.id === activeProgressionId ? { ...p, ...snapshot } : p
       );
     } else {
-      newSaved = [...savedProgressions, { id: `${Date.now()}`, name: progressionName, items: progression }];
+      newSaved = [...savedProgressions, { id: `${Date.now()}`, ...snapshot }];
     }
     setSavedProgressions(newSaved);
     localStorage.setItem('guitar-chord-progressions', JSON.stringify(newSaved));
     setProgression([]);
     setActiveProgressionId(null);
     setProgressionName('New Progression');
+  }
+
+  function handleDuplicateProgressionItem(uid: string) {
+    setProgression((prev) => {
+      const idx = prev.findIndex((p) => p.uid === uid);
+      if (idx === -1) return prev;
+      const copy = { ...prev[idx], uid: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}` };
+      return [...prev.slice(0, idx + 1), copy, ...prev.slice(idx + 1)];
+    });
   }
 
   function handleDeleteSavedProgression(id: string) {
@@ -345,6 +360,11 @@ export default function App() {
           savedProgressions={savedProgressions}
           onLoad={handleLoadProgression}
           onDeleteSaved={handleDeleteSavedProgression}
+          onDuplicate={handleDuplicateProgressionItem}
+          bpm={bpm}
+          onBpmChange={setBpm}
+          beatsPerMeasure={beatsPerMeasure}
+          onBeatsPerMeasureChange={setBeatsPerMeasure}
         />
 
         <DragOverlay dropAnimation={null}>

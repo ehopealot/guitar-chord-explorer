@@ -10,7 +10,7 @@ function midiToFreq(midi: number): number {
   return 440 * Math.pow(2, (midi - 69) / 12);
 }
 
-function pluckString(ctx: AudioContext, freq: number, startTime: number) {
+function pluckString(ctx: AudioContext, freq: number, startTime: number, volume = 1.0) {
   const sr = ctx.sampleRate;
   const N = Math.max(Math.round(sr / freq), 1);
   const duration = 4.0;
@@ -34,7 +34,7 @@ function pluckString(ctx: AudioContext, freq: number, startTime: number) {
   source.buffer = audioBuffer;
 
   const gain = ctx.createGain();
-  gain.gain.setValueAtTime(0.75, startTime);
+  gain.gain.setValueAtTime(0.75 * volume, startTime);
   gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration - 0.1);
 
   source.connect(gain);
@@ -50,4 +50,77 @@ export function playChord(midiNotes: number[], strumMs = 28) {
   midiNotes.forEach((midi, i) => {
     pluckString(ctx, midiToFreq(midi), now + (i * strumMs) / 1000);
   });
+}
+
+// Which beat indices (0-based) within a measure are unaccented (quieter).
+// Beat 0 is always the downbeat.
+const QUIET_BEATS: Record<number, Set<number>> = {
+  2: new Set([1]),
+  3: new Set([1, 2]),
+  4: new Set([1, 3]),
+  6: new Set([1, 2, 4, 5]),
+};
+
+const ACCENT_VOLUME = 1.0;
+const QUIET_VOLUME  = 0.45;
+
+// Lookahead scheduler for progression playback.
+// Audio is scheduled precisely via AudioContext clock; UI callbacks use
+// setTimeout (visual jitter is acceptable).
+const LOOKAHEAD_S = 0.2;
+const TICK_MS     = 25;
+
+let _stopPlayback: (() => void) | null = null;
+
+export function startProgressionPlayback(
+  chords: number[][],
+  bpm: number,
+  beatsPerMeasure: number,
+  onChordIndex: (i: number) => void,
+): void {
+  stopProgressionPlayback();
+  if (chords.length === 0) return;
+
+  const ctx = getCtx();
+  const secPerBeat = 60 / bpm;
+  const quietBeats = QUIET_BEATS[beatsPerMeasure] ?? QUIET_BEATS[4];
+  let nextTime = ctx.currentTime + 0.05;
+  let nextBeat = 0;
+  let stopped = false;
+
+  function tick() {
+    if (stopped) return;
+    const now = ctx.currentTime;
+    while (nextTime < now + LOOKAHEAD_S) {
+      const beatInMeasure = nextBeat % beatsPerMeasure;
+      const chordIdx = Math.floor(nextBeat / beatsPerMeasure) % chords.length;
+      const isUpstroke = nextBeat % 2 === 1;
+      const volume = quietBeats.has(beatInMeasure) ? QUIET_VOLUME : ACCENT_VOLUME;
+      const notes = chords[chordIdx];
+      const ordered = isUpstroke ? [...notes].reverse() : notes;
+      ordered.forEach((midi, i) => {
+        pluckString(ctx, midiToFreq(midi), nextTime + i * 0.018, volume);
+      });
+      // Fire UI callback on the first beat of each chord
+      if (beatInMeasure === 0) {
+        const delay = Math.max(0, (nextTime - now) * 1000);
+        const captured = chordIdx;
+        setTimeout(() => { if (!stopped) onChordIndex(captured); }, delay);
+      }
+      nextTime += secPerBeat;
+      nextBeat++;
+    }
+  }
+
+  tick();
+  const id = setInterval(tick, TICK_MS);
+  _stopPlayback = () => {
+    stopped = true;
+    clearInterval(id);
+    _stopPlayback = null;
+  };
+}
+
+export function stopProgressionPlayback(): void {
+  _stopPlayback?.();
 }

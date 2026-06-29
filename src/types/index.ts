@@ -34,4 +34,6 @@ export interface SavedProgression {
   id: string;
   name: string;
   items: { uid: string; voicing: NamedVoicing }[];
+  bpm?: number;
+  beatsPerMeasure?: number;
 }
