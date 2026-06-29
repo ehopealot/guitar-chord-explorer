@@ -74,7 +74,14 @@ body {
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-/* ── Tuning selector ── */
+/* ── Tuning + Capo selectors ── */
+
+.tuning-capo-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
 
 .tuning-bar {
   display: flex;

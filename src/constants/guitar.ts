@@ -40,10 +40,13 @@ export const MINI_SVG_WIDTH =
 export const MINI_SVG_HEIGHT =
   MINI_NUT_HEIGHT + MINI_VISIBLE_FRETS * MINI_FRET_SPACING + MINI_MARGIN_V + 16;
 
-export const VOICING_COLORS = [
-  '#2563eb', '#dc2626', '#16a34a',
-  '#d97706', '#7c3aed', '#0891b2',
-] as const;
+// Color by number of sounding strings (non-muted)
+export const STRING_COUNT_COLORS: Record<number, string> = {
+  3: '#f59e0b', // amber   — sparse / triadic
+  4: '#3b82f6', // blue    — four-string
+  5: '#10b981', // emerald — five-string
+  6: '#8b5cf6', // violet  — full six-string
+};
 
 // Maps tonal tonic strings to chords-db keys (which use "C#", "F#", "Eb", "Ab", "Bb")
 export const TONIC_TO_DB_KEY: Record<string, string> = {

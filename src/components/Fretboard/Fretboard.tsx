@@ -12,6 +12,7 @@ interface FretboardProps {
   positions: FretboardPositions;
   viewportFret: number;
   stringNames: readonly string[];
+  capo: number;
   onFretClick: (stringIdx: number, fretNum: number) => void;
   onStringHeaderClick: (stringIdx: number) => void;
 }
@@ -22,6 +23,7 @@ export function Fretboard({
   positions,
   viewportFret,
   stringNames,
+  capo,
   onFretClick,
   onStringHeaderClick,
 }: FretboardProps) {
@@ -40,7 +42,7 @@ export function Fretboard({
         .fret-cell .hover-dot { opacity: 0; transition: opacity 0.1s; }
       `}</style>
 
-      <FretboardGrid viewportFret={viewportFret} stringNames={stringNames} />
+      <FretboardGrid viewportFret={viewportFret} stringNames={stringNames} capo={capo} />
       <FretLabel viewportFret={viewportFret} />
 
       {/* Clickable cells with hover ghost + selected dots */}
@@ -51,7 +53,7 @@ export function Fretboard({
           const y = getY(fi + 1);
           const isSelected = positions[si] === actualFret;
           return (
-            <g key={`${si}-${fi}`} className="fret-cell" onClick={() => onFretClick(si, actualFret)} style={{ cursor: 'pointer' }}>
+            <g key={`${si}-${fi}`} className="fret-cell" onClick={() => actualFret >= capo && onFretClick(si, actualFret)} style={{ cursor: actualFret < capo ? 'not-allowed' : 'pointer' }}>
               {/* Hit area */}
               <rect
                 x={x - STRING_SPACING / 2}

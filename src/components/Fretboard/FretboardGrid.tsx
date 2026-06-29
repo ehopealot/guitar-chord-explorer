@@ -18,10 +18,22 @@ const STRING_COLORS = ['#b89050', '#c09a5a', '#c8a868', '#bfb060', '#c0c0c0', '#
 interface FretboardGridProps {
   viewportFret: number;
   stringNames: readonly string[];
+  capo: number;
 }
 
-export function FretboardGrid({ viewportFret, stringNames }: FretboardGridProps) {
+export function FretboardGrid({ viewportFret, stringNames, capo }: FretboardGridProps) {
   const gradId = 'fretboard-wood';
+
+  // Wire index within the viewport where the capo sits (fret N wire = index N - viewportFret + 1)
+  const capoWireIndex = capo > 0 ? capo - viewportFret + 1 : -1;
+  const capoInView = capoWireIndex >= 1 && capoWireIndex <= VISIBLE_FRETS;
+
+  // Fret rows above the capo wire are behind the capo and should be shaded
+  // If capo is above the viewport, shade the entire board
+  const shadedRows = capo > 0
+    ? (capo < viewportFret ? VISIBLE_FRETS : Math.min(Math.max(capoWireIndex - 1, 0), VISIBLE_FRETS))
+    : 0;
+
   return (
     <g>
       <defs>
@@ -42,7 +54,7 @@ export function FretboardGrid({ viewportFret, stringNames }: FretboardGridProps)
         fill={`url(#${gradId})`}
       />
 
-      {/* Inlay position markers (inside the fretboard) */}
+      {/* Inlay position markers */}
       {Array.from({ length: VISIBLE_FRETS }, (_, i) => {
         const actualFret = viewportFret + i;
         const isMarker = MARKER_FRETS.has(actualFret);
@@ -60,7 +72,7 @@ export function FretboardGrid({ viewportFret, stringNames }: FretboardGridProps)
         );
       })}
 
-      {/* Fret lines (metallic silver-gold wire) */}
+      {/* Fret lines */}
       {Array.from({ length: VISIBLE_FRETS + 1 }, (_, i) => (
         <line
           key={i}
@@ -86,6 +98,46 @@ export function FretboardGrid({ viewportFret, stringNames }: FretboardGridProps)
           strokeWidth={STRING_WIDTHS[i]}
         />
       ))}
+
+      {/* Shading over frets behind the capo */}
+      {shadedRows > 0 && (
+        <rect
+          x={MARGIN_LEFT - 1}
+          y={NUT_Y}
+          width={FRETBOARD_WIDTH + 2}
+          height={shadedRows * FRET_SPACING}
+          fill="rgba(0,0,0,0.45)"
+          pointerEvents="none"
+        />
+      )}
+
+      {/* Capo bar */}
+      {capoInView && (
+        <g>
+          <rect
+            x={MARGIN_LEFT - 6}
+            y={NUT_Y + capoWireIndex * FRET_SPACING - 5}
+            width={FRETBOARD_WIDTH + 12}
+            height={10}
+            rx={5}
+            ry={5}
+            fill="#1a1a2e"
+            stroke="#4a4a6a"
+            strokeWidth={1}
+          />
+          <text
+            x={MARGIN_LEFT + FRETBOARD_WIDTH + 14}
+            y={NUT_Y + capoWireIndex * FRET_SPACING + 1}
+            dominantBaseline="central"
+            fontSize={9}
+            fontWeight="700"
+            fill="#888"
+            letterSpacing="0"
+          >
+            {capo}
+          </text>
+        </g>
+      )}
 
       {/* String name labels at bottom */}
       {Array.from({ length: NUM_STRINGS }, (_, i) => (

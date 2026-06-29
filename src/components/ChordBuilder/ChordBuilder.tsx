@@ -1,10 +1,9 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { get as getChord } from '@tonaljs/chord';
 import { lookupVoicings } from '../../lib/voicingLookup';
 import { DraggableVoicingCard } from '../VoicingCard/DraggableVoicingCard';
 import type { DetectedChord } from '../../types';
 
-const MAX_DISPLAY = 24;
 const SLIDER_MAX = 15;
 
 // [display label, value to append] — or just a string for both
@@ -22,20 +21,20 @@ const GROUPS: { label: string; keys: Key[] }[] = [
 
 interface ChordBuilderProps {
   openMidi: readonly number[];
+  capo: number;
 }
 
-export function ChordBuilder({ openMidi }: ChordBuilderProps) {
+export function ChordBuilder({ openMidi, capo }: ChordBuilderProps) {
   const [text, setText] = useState('');
-  const [startFret, setStartFret] = useState(1);
+  const [startFret, setStartFret] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setStartFret(prev => Math.max(prev, capo));
+  }, [capo]);
 
   function append(val: string) {
     setText(prev => prev + val);
-    inputRef.current?.focus();
-  }
-
-  function backspace() {
-    setText(prev => prev.slice(0, -1));
     inputRef.current?.focus();
   }
 
@@ -60,12 +59,11 @@ export function ChordBuilder({ openMidi }: ChordBuilderProps) {
       aliases: chordInfo.aliases,
       displayName: text.trim(),
     };
-    return lookupVoicings([detected], openMidi);
-  }, [chordInfo, openMidi, text]);
+    return lookupVoicings([detected], openMidi, capo);
+  }, [chordInfo, openMidi, capo, text]);
 
   const displayed = allVoicings
-    .filter(v => v.position.baseFret >= startFret)
-    .slice(0, MAX_DISPLAY);
+    .filter(v => v.position.baseFret >= startFret);
 
   return (
     <div className="chord-builder">
@@ -130,7 +128,7 @@ export function ChordBuilder({ openMidi }: ChordBuilderProps) {
               <input
                 id="builder-fret-slider"
                 type="range"
-                min={1}
+                min={capo}
                 max={SLIDER_MAX}
                 value={startFret}
                 onChange={e => setStartFret(Number(e.target.value))}

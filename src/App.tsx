@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   DndContext, DragOverlay, PointerSensor, useSensor, useSensors,
 } from '@dnd-kit/core';
@@ -19,15 +19,20 @@ import type { Tuning } from './constants/tunings';
 import type { NamedVoicing } from './types';
 import './App.css';
 
-const MAX_DISPLAY = 24;
 const SLIDER_MAX = 15;
 
 export default function App() {
   const [tuning, setTuning] = useState<Tuning>(DEFAULT_TUNING);
+  const [capo, setCapo] = useState(0);
   const [activeTab, setActiveTab] = useState<'fretboard' | 'builder'>('fretboard');
-  const [startFret, setStartFret] = useState(1);
+  const [startFret, setStartFret] = useState(0);
   const [progression, setProgression] = useState<ProgressionItem[]>([]);
   const [activeDrag, setActiveDrag] = useState<NamedVoicing | null>(null);
+
+  const effectiveMidi = useMemo(
+    () => tuning.midi.map(m => m + capo) as unknown as readonly number[],
+    [tuning, capo],
+  );
 
   const {
     positions,
@@ -40,11 +45,10 @@ export default function App() {
   } = useFretboard();
 
   const { notes, detectedChords, primaryChord, alternativeVoicings } =
-    useChordDetection(positions, tuning);
+    useChordDetection(positions, tuning.midi, effectiveMidi, capo);
 
   const displayedVoicings = alternativeVoicings
-    .filter((v) => v.position.baseFret >= startFret)
-    .slice(0, MAX_DISPLAY);
+    .filter((v) => v.position.baseFret >= startFret);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -53,6 +57,14 @@ export default function App() {
   function handleTuningChange(e: React.ChangeEvent<HTMLSelectElement>) {
     const next = TUNINGS.find((t) => t.id === e.target.value) ?? DEFAULT_TUNING;
     setTuning(next);
+    clearAll();
+  }
+
+  function handleCapoChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const newCapo = Number(e.target.value);
+    setCapo(newCapo);
+    setStartFret(prev => Math.max(prev, newCapo));
+    clearAll();
   }
 
   function handleDragStart(event: DragStartEvent) {
@@ -105,20 +117,36 @@ export default function App() {
 
           {/* Global controls: tuning + tabs */}
           <div className="app-controls">
-            <div className="tuning-bar">
-              <label htmlFor="tuning-select" className="tuning-label">Tuning</label>
-              <select
-                id="tuning-select"
-                className="tuning-select"
-                value={tuning.id}
-                onChange={handleTuningChange}
-              >
-                {TUNINGS.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.name} — {t.notes}
-                  </option>
-                ))}
-              </select>
+            <div className="tuning-capo-bar">
+              <div className="tuning-bar">
+                <label htmlFor="tuning-select" className="tuning-label">Tuning</label>
+                <select
+                  id="tuning-select"
+                  className="tuning-select"
+                  value={tuning.id}
+                  onChange={handleTuningChange}
+                >
+                  {TUNINGS.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.name} — {t.notes}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="tuning-bar">
+                <label htmlFor="capo-select" className="tuning-label">Capo</label>
+                <select
+                  id="capo-select"
+                  className="tuning-select"
+                  value={capo}
+                  onChange={handleCapoChange}
+                >
+                  <option value={0}>None</option>
+                  {Array.from({ length: 9 }, (_, i) => i + 1).map(n => (
+                    <option key={n} value={n}>Fret {n}</option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             <div className="tab-bar" role="tablist">
@@ -150,6 +178,7 @@ export default function App() {
                       positions={positions}
                       viewportFret={viewportFret}
                       stringNames={tuning.stringNames}
+                      capo={capo}
                       onFretClick={handleFretClick}
                       onStringHeaderClick={handleStringHeaderClick}
                     />
@@ -182,7 +211,7 @@ export default function App() {
                         <input
                           id="start-fret-slider"
                           type="range"
-                          min={1}
+                          min={capo}
                           max={SLIDER_MAX}
                           value={startFret}
                           onChange={(e) => setStartFret(Number(e.target.value))}
@@ -205,7 +234,7 @@ export default function App() {
             )}
 
             {activeTab === 'builder' && (
-              <ChordBuilder openMidi={tuning.midi} />
+              <ChordBuilder openMidi={effectiveMidi} capo={capo} />
             )}
           </main>
         </div>

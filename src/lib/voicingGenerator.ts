@@ -12,7 +12,7 @@ function normalize(note: string): string {
 
 // How many independent finger placements does this voicing need?
 // Strings sharing the lowest fretted position can be covered by one barre finger.
-function effectiveFingers(absFrets: number[]): number {
+export function effectiveFingers(absFrets: number[]): number {
   const fretted = absFrets.filter((f) => f > 0);
   if (fretted.length === 0) return 0;
   const minF = Math.min(...fretted);

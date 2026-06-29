@@ -85,14 +85,13 @@ export function ProgressionArea({ items, onRemove, onClear }: ProgressionAreaPro
   return (
     <section className="progression-section" ref={sectionRef}>
       <div className="progression-inner">
-        <div className="progression-bar">
-          <span className="progression-title">Progression</span>
-          {items.length > 0 && (
+        {items.length > 0 && (
+          <div className="progression-bar">
             <button className="btn--ghost" onClick={onClear}>
               Clear
             </button>
-          )}
-        </div>
+          </div>
+        )}
 
         <SortableContext
           items={items.map((i) => i.uid)}
