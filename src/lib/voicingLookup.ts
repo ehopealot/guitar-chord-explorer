@@ -54,10 +54,9 @@ export function lookupVoicings(
   for (const chord of detectedChords.slice(0, 4)) {
     const dbKey = TONIC_TO_DB_KEY[chord.tonic];
     const suffix = resolveDbSuffix(chord);
-    if (!dbKey || !suffix) continue;
 
-    // Phase 1: curated DB positions (standard tuning only)
-    if (isStandard) {
+    // Phase 1: curated DB positions (standard tuning + matched suffix only)
+    if (isStandard && dbKey && suffix) {
       const entries = dbChords[dbKey] ?? [];
       const matched = entries.find((e) => e.suffix === suffix);
       for (const pos of matched?.positions ?? []) {
@@ -65,13 +64,14 @@ export function lookupVoicings(
       }
     }
 
-    // Phase 2: algorithmically generated positions
+    // Phase 2: algorithmically generated positions (always runs if notes available)
     if (voicings.length < limit) {
       const chordData = getChord(chord.name);
       if (!chordData.empty && chordData.notes.length >= 2) {
+        const displaySuffix = suffix ?? chord.type;
         for (const pos of generateVoicings(chordData.notes, openMidi)) {
           if (voicings.length >= limit) break;
-          push(pos, chord, suffix);
+          push(pos, chord, displaySuffix);
         }
       }
     }
