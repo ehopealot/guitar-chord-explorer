@@ -26,8 +26,8 @@ export function useChordDetection(
   const primaryChord = detectedChords[0] ?? null;
 
   const alternativeVoicings = useMemo(
-    () => (primaryChord ? lookupVoicings(detectedChords, effectiveMidi, capo) : []),
-    [detectedChords, primaryChord, effectiveMidi, capo],
+    () => (primaryChord ? lookupVoicings([primaryChord], effectiveMidi, capo) : []),
+    [primaryChord, effectiveMidi, capo],
   );
 
   return { notes, detectedChords, primaryChord, alternativeVoicings };

@@ -4,6 +4,7 @@ import type { VoicingPosition } from '../types';
 // @tonaljs/chord returns flat names; CHROMATIC is all-sharps
 const ENHARMONIC: Record<string, string> = {
   Bb: 'A#', Cb: 'B', Db: 'C#', Eb: 'D#', Fb: 'E', Gb: 'F#', Ab: 'G#',
+  'B#': 'C', 'E#': 'F',
 };
 
 function normalize(note: string): string {
