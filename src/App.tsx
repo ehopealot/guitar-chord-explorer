@@ -261,7 +261,7 @@ export default function App() {
                     />
                   </div>
                   <div className="fretboard-hint">
-                    Click a string header (O / X / ·) to set open or muted
+                    Click a string header to toggle open or muted
                   </div>
                 </section>
 

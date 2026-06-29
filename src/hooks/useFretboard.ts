@@ -11,19 +11,16 @@ export function useFretboard() {
   const handleFretClick = useCallback((stringIdx: number, fretNum: number) => {
     setPositions((prev) => {
       const next = [...prev] as FretboardPositions;
-      next[stringIdx] = prev[stringIdx] === fretNum ? null : fretNum;
+      next[stringIdx] = prev[stringIdx] === fretNum ? 0 : fretNum;
       return next;
     });
   }, []);
 
-  // Cycle: null → 0 (open) → -1 (muted) → null
+  // Toggle: open (0) ↔ muted (-1)
   const handleStringHeaderClick = useCallback((stringIdx: number) => {
     setPositions((prev) => {
       const next = [...prev] as FretboardPositions;
-      const cur = prev[stringIdx];
-      if (cur === null) next[stringIdx] = 0;
-      else if (cur === 0) next[stringIdx] = -1;
-      else next[stringIdx] = null;
+      next[stringIdx] = prev[stringIdx] === -1 ? 0 : -1;
       return next;
     });
   }, []);

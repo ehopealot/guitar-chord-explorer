@@ -12,7 +12,7 @@ export function useChordDetection(
 ) {
   // Open strings (pos 0) sound at the capo fret, not the nut
   const adjustedPositions = useMemo(
-    () => capo === 0 ? positions : positions.map(p => (p === 0 ? capo : p)),
+    () => capo === 0 ? positions : positions.map(p => (p === 0 ? capo : p)) as FretboardPositions,
     [positions, capo],
   );
 
