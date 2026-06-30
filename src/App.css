@@ -1100,3 +1100,88 @@ body {
   background: var(--danger-text);
   color: #fff;
 }
+
+/* ── Mobile styles ── */
+
+@media (max-width: 768px) {
+
+  /* More breathing room at bottom for taller progression strip */
+  .app {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .app-header h1 { font-size: 20px; }
+
+  /* Stack tuning/capo controls above tabs */
+  .app-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  /* Fretboard: let it scroll horizontally rather than overflow */
+  .fretboard-section {
+    width: 100%;
+    overflow-x: auto;
+    align-items: flex-start;
+  }
+
+  /* Stack fretboard + control buttons vertically */
+  .fretboard-container {
+    flex-direction: column;
+    gap: 14px;
+    min-width: max-content;
+  }
+
+  .controls {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  /* Chord display */
+  .chord-name { font-size: 24px; }
+  .chord-display { padding: 14px; }
+
+  /* Voicings header: let filters wrap below heading */
+  .voicings-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .fret-slider { width: 110px; }
+
+  /* Chord builder */
+  .chord-input { font-size: 18px; padding: 10px 40px 10px 12px; }
+  .builder-group-label { width: 56px; font-size: 10px; }
+  .builder-btn { padding: 6px 10px; font-size: 12px; }
+
+  /* Progression strip: stack library below main area */
+  .progression-inner {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .progression-library {
+    width: 100%;
+  }
+
+  /* Library as a horizontal scrollable row on mobile */
+  .library-list {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    max-height: none;
+    gap: 6px;
+    padding-bottom: 2px;
+  }
+
+  .library-item {
+    flex-shrink: 0;
+  }
+
+  .bpm-slider { width: 90px; }
+}
